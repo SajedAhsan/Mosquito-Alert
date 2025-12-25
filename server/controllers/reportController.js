@@ -1,0 +1,227 @@
+const Report = require('../models/Report');
+const User = require('../models/User');
+
+/**
+ * Report Controller - No AI Validation
+ * Admin manually validates all reports
+ */
+
+/**
+ * @route   POST /api/reports
+ * @desc    Create a new mosquito report (pending admin validation)
+ * @access  Private (User only)
+ */
+exports.createReport = async (req, res) => {
+  try {
+    const { location, breedingType, severity } = req.body;
+
+    // Validation
+    if (!location || !breedingType || !severity) {
+      return res.status(400).json({ 
+        message: 'All fields are required: location, breedingType, severity' 
+      });
+    }
+
+    // Image is MANDATORY
+    if (!req.file) {
+      return res.status(400).json({ 
+        message: 'Image upload is required. Please upload an image.' 
+      });
+    }
+
+    // Create report with PENDING status
+    const report = await Report.create({
+      userId: req.user._id,
+      location,
+      breedingType,
+      severity,
+      imagePath: req.file.path,
+      status: 'PENDING',
+      pointsAwarded: 0,
+    });
+
+    // Populate user data
+    const populatedReport = await Report.findById(report._id).populate('userId', 'name email');
+
+    res.status(201).json({
+      message: 'Report created successfully! Awaiting admin validation.',
+      report: populatedReport,
+    });
+  } catch (error) {
+    console.error('Create Report Error:', error.message);
+    res.status(500).json({ message: 'Server error creating report' });
+  }
+};
+
+/**
+ * @route   GET /api/reports
+ * @desc    Get all reports (for feed view)
+ * @access  Private
+ */
+exports.getAllReports = async (req, res) => {
+  try {
+    const reports = await Report.find()
+      .populate('userId', 'name email')
+      .sort({ date: -1 }); // Newest first
+
+    res.json(reports);
+  } catch (error) {
+    console.error('Get All Reports Error:', error.message);
+    res.status(500).json({ message: 'Server error fetching reports' });
+  }
+};
+
+/**
+ * @route   GET /api/reports/my-reports
+ * @desc    Get current user's reports
+ * @access  Private
+ */
+exports.getMyReports = async (req, res) => {
+  try {
+    const reports = await Report.find({ userId: req.user._id })
+      .populate('userId', 'name email')
+      .sort({ date: -1 });
+
+    res.json(reports);
+  } catch (error) {
+    console.error('Get My Reports Error:', error.message);
+    res.status(500).json({ message: 'Server error fetching reports' });
+  }
+};
+
+/**
+ * @route   GET /api/reports/:id
+ * @desc    Get single report by ID
+ * @access  Private
+ */
+exports.getReportById = async (req, res) => {
+  try {
+    const report = await Report.findById(req.params.id).populate('userId', 'name email');
+
+    if (!report) {
+      return res.status(404).json({ message: 'Report not found' });
+    }
+
+    res.json(report);
+  } catch (error) {
+    console.error('Get Report By ID Error:', error.message);
+    res.status(500).json({ message: 'Server error fetching report' });
+  }
+};
+
+/**
+ * @route   PUT /api/reports/:id/status
+ * @desc    Update report status (Admin only)
+ * @access  Private (Admin)
+ */
+exports.updateReportStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ message: 'Status is required' });
+    }
+
+    const report = await Report.findById(req.params.id).populate('userId');
+
+    if (!report) {
+      return res.status(404).json({ message: 'Report not found' });
+    }
+
+    const oldStatus = report.status;
+    const user = await User.findById(report.userId._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Handle point allocation/deduction
+    let pointsChange = 0;
+
+    // If changing from PENDING to VALID, award points
+    if (oldStatus === 'PENDING' && status === 'VALID') {
+      pointsChange = 10;
+      report.pointsAwarded = 10;
+    }
+    
+    // If changing from PENDING to INVALID, deduct points and DELETE the report
+    if (oldStatus === 'PENDING' && status === 'INVALID') {
+      pointsChange = -5;
+      
+      // Deduct points from user
+      user.points = Math.max(0, user.points + pointsChange);
+      await user.save();
+      
+      // Delete the invalid report permanently
+      await Report.findByIdAndDelete(req.params.id);
+      
+      return res.json({ 
+        message: `Report marked as INVALID and deleted. User lost 5 points.`,
+        pointsChange,
+        deleted: true
+      });
+    }
+
+    // If changing from VALID back to something else, remove awarded points
+    if (oldStatus === 'VALID' && status !== 'VALID') {
+      pointsChange = -report.pointsAwarded;
+      report.pointsAwarded = 0;
+    }
+
+    // Update user points
+    if (pointsChange !== 0) {
+      user.points = Math.max(0, user.points + pointsChange); // Ensure points don't go negative
+      await user.save();
+    }
+
+    // Update report status
+    report.status = status;
+    await report.save();
+
+    // Populate user data before returning
+    await report.populate('userId', 'name email');
+
+    res.json({ 
+      message: `Report marked as ${status}. ${pointsChange > 0 ? `User earned ${pointsChange} points.` : pointsChange < 0 ? `User lost ${Math.abs(pointsChange)} points.` : ''}`,
+      report,
+      pointsChange,
+    });
+  } catch (error) {
+    console.error('Update Status Error:', error.message);
+    res.status(500).json({ message: 'Server error updating status' });
+  }
+};
+
+/**
+ * @route   DELETE /api/reports/:id
+ * @desc    Delete user's own report
+ * @access  Private (User)
+ */
+exports.deleteReport = async (req, res) => {
+  try {
+    const report = await Report.findById(req.params.id);
+
+    if (!report) {
+      return res.status(404).json({ message: 'Report not found' });
+    }
+
+    // Check if user owns the report
+    if (report.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to delete this report' });
+    }
+
+    // If report was VALID and points were awarded, deduct them
+    if (report.status === 'VALID' && report.pointsAwarded > 0) {
+      await User.findByIdAndUpdate(req.user._id, {
+        $inc: { points: -report.pointsAwarded },
+      });
+    }
+
+    await Report.findByIdAndDelete(req.params.id);
+
+    res.json({ message: 'Report deleted successfully' });
+  } catch (error) {
+    console.error('Delete Report Error:', error.message);
+    res.status(500).json({ message: 'Server error deleting report' });
+  }
+};
