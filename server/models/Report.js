@@ -10,10 +10,23 @@ const reportSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  // `location` can contain coordinates (`lat`/`lng`) and/or a textual `address`.
+  // Map selection is optional; either coords or address (or both) are allowed.
   location: {
-    type: String,
-    required: [true, 'Location is required'],
-    trim: true,
+    lat: {
+      type: Number,
+      min: [-90, 'Latitude must be >= -90'],
+      max: [90, 'Latitude must be <= 90'],
+    },
+    lng: {
+      type: Number,
+      min: [-180, 'Longitude must be >= -180'],
+      max: [180, 'Longitude must be <= 180'],
+    },
+    address: {
+      type: String,
+      trim: true,
+    },
   },
   breedingType: {
     type: String,
@@ -44,7 +57,7 @@ const reportSchema = new mongoose.Schema({
   },
 });
 
-// Index for efficient queries
-reportSchema.index({ location: 1, breedingType: 1, date: 1 });
+// Index for efficient queries (index coordinates separately)
+reportSchema.index({ 'location.lat': 1, 'location.lng': 1, breedingType: 1, date: 1 });
 
 module.exports = mongoose.model('Report', reportSchema);

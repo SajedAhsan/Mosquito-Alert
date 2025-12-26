@@ -15,11 +15,46 @@ exports.createReport = async (req, res) => {
   try {
     const { location, breedingType, severity } = req.body;
 
-    // Validation
-    if (!location || !breedingType || !severity) {
+    // Parse location if sent as JSON string (coords) and/or accept textual location
+    let locationObj = null;
+    if (location) {
+      try {
+        locationObj = typeof location === 'string' ? JSON.parse(location) : location;
+      } catch (err) {
+        // ignore, fallback to null
+      }
+    }
+
+    const locationText = req.body.locationText && String(req.body.locationText).trim();
+
+    // Require either coordinates (lat/lng) OR a textual location description
+    let normalizedLocation = {};
+
+    if (locationObj && typeof locationObj.lat !== 'undefined' && typeof locationObj.lng !== 'undefined') {
+      const lat = parseFloat(locationObj.lat);
+      const lng = parseFloat(locationObj.lng);
+
+      if (Number.isNaN(lat) || Number.isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        return res.status(400).json({ message: 'Invalid coordinates. Ensure lat is -90..90 and lng is -180..180' });
+      }
+
+      normalizedLocation.lat = lat;
+      normalizedLocation.lng = lng;
+    }
+
+    if (locationText) {
+      normalizedLocation.address = locationText;
+    }
+
+    if ((!normalizedLocation.lat && normalizedLocation.lat !== 0) && !normalizedLocation.address) {
       return res.status(400).json({ 
-        message: 'All fields are required: location, breedingType, severity' 
+        message: 'Please provide a location: either map coordinates or a textual description (locationText)' 
       });
+    }
+
+    // Validate other required fields
+    if (!breedingType || !severity) {
+      return res.status(400).json({ message: 'breedingType and severity are required' });
     }
 
     // Image is MANDATORY
@@ -32,7 +67,7 @@ exports.createReport = async (req, res) => {
     // Create report with PENDING status
     const report = await Report.create({
       userId: req.user._id,
-      location,
+      location: normalizedLocation,
       breedingType,
       severity,
       imagePath: req.file.path,

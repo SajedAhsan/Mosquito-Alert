@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import API from '../api/axios';
 import { FaCloudUploadAlt, FaTimes, FaCheckCircle } from 'react-icons/fa';
+import LocationPicker from '../components/LocationPicker';
 
 /**
  * Create Report Form Component
@@ -13,7 +14,7 @@ const CreateReport = () => {
   const { user, updateUser } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
-    location: '',
+    locationText: '',
     breedingType: '',
     severity: '',
   });
@@ -24,7 +25,8 @@ const CreateReport = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const { location, breedingType, severity } = formData;
+  const { locationText, breedingType, severity } = formData;
+  const [selectedCoords, setSelectedCoords] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -107,8 +109,8 @@ const CreateReport = () => {
     setSuccess('');
 
     // Validation
-    if (!location || !breedingType || !severity) {
-      setError('Please fill in all fields');
+    if (!selectedCoords || !breedingType || !severity) {
+      setError('Please choose a location on the map and fill other fields');
       return;
     }
 
@@ -119,7 +121,14 @@ const CreateReport = () => {
 
     // Prepare form data
     const reportData = new FormData();
-    reportData.append('location', location);
+    // Attach coordinates as a JSON string so server can parse an object
+    if (selectedCoords) {
+      reportData.append('location', JSON.stringify(selectedCoords));
+    }
+    // Attach optional textual location description
+    if (locationText && locationText.trim() !== '') {
+      reportData.append('locationText', locationText.trim());
+    }
     reportData.append('breedingType', breedingType);
     reportData.append('severity', severity);
     reportData.append('image', image);
@@ -139,9 +148,10 @@ const CreateReport = () => {
       updateUser({ points: user.points + data.pointsEarned });
 
       // Reset form
-      setFormData({ location: '', breedingType: '', severity: '' });
+          setFormData({ locationText: '', breedingType: '', severity: '' });
       setImage(null);
       setImagePreview(null);
+          setSelectedCoords(null);
 
       // Redirect after 2 seconds
       setTimeout(() => {
@@ -237,20 +247,31 @@ const CreateReport = () => {
             )}
           </div>
 
-          {/* Location Input */}
+          {/* Location Picker + optional text */}
           <div>
             <label className="block text-gray-700 text-sm font-semibold mb-2">
-              Location <span className="text-red-500">*</span>
+              Location (pick on map) <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              name="location"
-              value={location}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="e.g., Park Street, Downtown"
-              required
-            />
+            <LocationPicker onLocationSelect={setSelectedCoords} />
+
+            <div className="mt-4">
+              <label className="block text-gray-700 text-sm font-semibold mb-2">
+                Location description (optional)
+              </label>
+              <input
+                type="text"
+                name="locationText"
+                value={locationText}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                placeholder="e.g., Park Street, Downtown"
+              />
+              {selectedCoords && (
+                <div className="text-sm text-gray-600 mt-2">
+                  Selected coordinates: Lat {selectedCoords.lat.toFixed(6)}, Lng {selectedCoords.lng.toFixed(6)}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Breeding Type Select */}
