@@ -145,7 +145,7 @@ const ReportFeedCard = ({ report, onDelete }) => {
         <div className="relative w-full h-80 bg-gray-200">
           <img
             src={imageUrl}
-            alt={`Breeding site at ${report.location}`}
+            alt={`Breeding site at ${typeof report.location === 'string' ? report.location : 'specified location'}`}
             className="w-full h-full object-cover"
             loading="lazy"
             onError={(e) => {
@@ -170,9 +170,22 @@ const ReportFeedCard = ({ report, onDelete }) => {
           <FaMapMarkerAlt className="text-red-500 text-xl mt-1 flex-shrink-0" />
           <div>
             <h3 className="text-xl font-bold text-gray-900 leading-tight">
-              {report.location}
+              {report.locationText || report.location?.address || 'Location not specified'}
             </h3>
           </div>
+        </div>
+
+        {/* Description */}
+        <div className="mb-4">
+          {report.description ? (
+            <p className="text-gray-700 text-base leading-relaxed bg-gray-50 p-4 rounded-lg border border-gray-200">
+              {report.description}
+            </p>
+          ) : (
+            <p className="text-gray-400 text-sm italic">
+              No description added
+            </p>
+          )}
         </div>
 
         {/* Breeding Type & Severity Badges */}
@@ -195,13 +208,6 @@ const ReportFeedCard = ({ report, onDelete }) => {
             </span>
           )}
         </div>
-
-        {/* Description */}
-        {report.description && (
-          <p className="text-gray-700 text-base leading-relaxed mb-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
-            {report.description}
-          </p>
-        )}
 
         {/* Footer - Date & Actions */}
         <div className="flex items-center justify-between pt-4 border-t border-gray-200">

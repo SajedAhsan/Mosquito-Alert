@@ -124,13 +124,6 @@ const Login = () => {
             Sign Up
           </Link>
         </p>
-
-        {/* Admin Note */}
-        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-sm text-yellow-800">
-            <strong>Note:</strong> Admins use the same login page. Admin accounts are pre-created.
-          </p>
-        </div>
       </div>
     </div>
   );

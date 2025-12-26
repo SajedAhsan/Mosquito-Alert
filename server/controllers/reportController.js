@@ -2,13 +2,13 @@ const Report = require('../models/Report');
 const User = require('../models/User');
 
 /**
- * Report Controller - No AI Validation
- * Admin manually validates all reports
+ * Report Controller - AI Validation
+ * Reports are validated by AI before submission
  */
 
 /**
  * @route   POST /api/reports
- * @desc    Create a new mosquito report (pending admin validation)
+ * @desc    Create a new mosquito report (AI validated)
  * @access  Private (User only)
  */
 exports.createReport = async (req, res) => {
@@ -26,6 +26,7 @@ exports.createReport = async (req, res) => {
     }
 
     const locationText = req.body.locationText && String(req.body.locationText).trim();
+    const description = req.body.description && String(req.body.description).trim();
 
     // Require either coordinates (lat/lng) OR a textual location description
     let normalizedLocation = {};
@@ -64,22 +65,29 @@ exports.createReport = async (req, res) => {
       });
     }
 
-    // Create report with PENDING status
+    // Create report with VALID status (AI already validated)
     const report = await Report.create({
       userId: req.user._id,
       location: normalizedLocation,
+      locationText: locationText || null,
+      description: description || null,
       breedingType,
       severity,
       imagePath: req.file.path,
-      status: 'PENDING',
-      pointsAwarded: 0,
+      status: 'VALID',
+      pointsAwarded: 10, // Award points immediately since AI validated
+    });
+
+    // Update user points
+    await User.findByIdAndUpdate(req.user._id, {
+      $inc: { points: 10 }
     });
 
     // Populate user data
     const populatedReport = await Report.findById(report._id).populate('userId', 'name email');
 
     res.status(201).json({
-      message: 'Report created successfully! Awaiting admin validation.',
+      message: 'Report created successfully! AI validated.',
       report: populatedReport,
     });
   } catch (error) {

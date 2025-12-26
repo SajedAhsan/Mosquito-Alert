@@ -53,9 +53,9 @@ exports.getWeeklyReports = async (req, res) => {
       { $sort: { _id: 1 } }
     ]);
 
-    // Format for chart
+    // Format for chart - use 'day' instead of 'date'
     const chartData = reports.map(item => ({
-      date: item._id,
+      day: item._id,
       count: item.count,
     }));
 
@@ -105,16 +105,17 @@ exports.getAreaRisk = async (req, res) => {
     const areaReports = await Report.aggregate([
       {
         $group: {
-          _id: '$location',
+          _id: '$locationText',
           reportCount: { $sum: 1 },
           highSeverityCount: {
             $sum: { $cond: [{ $eq: ['$severity', 'High'] }, 1, 0] }
           },
           validCount: {
-            $sum: { $cond: [{ $eq: ['$aiVerdict', 'VALID'] }, 1, 0] }
+            $sum: { $cond: [{ $eq: ['$status', 'VALID'] }, 1, 0] }
           }
         }
       },
+      { $match: { _id: { $ne: null, $ne: '' } } },
       { $sort: { reportCount: -1 } },
       { $limit: 10 }
     ]);
@@ -131,7 +132,7 @@ exports.getAreaRisk = async (req, res) => {
       }
 
       return {
-        location: area._id,
+        location: area._id || 'Unknown Location',
         reportCount: area.reportCount,
         riskLevel,
         riskScore,

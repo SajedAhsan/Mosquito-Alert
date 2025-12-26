@@ -131,8 +131,21 @@ const ReportCard = ({ report, showDeleteButton = false, onDelete }) => {
         {/* Location */}
         <div className="flex items-center space-x-2">
           <FaMapMarkerAlt className="text-gray-500" />
-          <span className="text-gray-700 font-medium">{report.location}</span>
+          <span className="text-gray-700 font-medium">
+            {report.locationText || report.location?.address || 'Location not specified'}
+          </span>
         </div>
+
+        {/* Description */}
+        {report.description ? (
+          <div className="text-gray-600 text-sm">
+            <p>{report.description}</p>
+          </div>
+        ) : (
+          <div className="text-gray-400 text-sm italic">
+            <p>No description added</p>
+          </div>
+        )}
 
         {/* Badges Row */}
         <div className="flex flex-wrap gap-2">

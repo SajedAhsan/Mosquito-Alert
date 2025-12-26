@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Navbar';
@@ -14,16 +14,16 @@ import Leaderboard from './pages/Leaderboard';
 import MyReports from './pages/MyReports';
 
 /**
- * Main App Component
- * Handles routing and authentication
+ * Layout component to conditionally show Navbar
  */
-function App() {
+function Layout() {
+  const location = useLocation();
+  const hideNavbar = ['/login', '/signup'].includes(location.pathname);
+
   return (
-    <AuthProvider>
-      <Router>
-        <div className="App">
-          <Navbar />
-          <Routes>
+    <div className="App">
+      {!hideNavbar && <Navbar />}
+      <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/signup" element={<Signup />} />
@@ -77,6 +77,18 @@ function App() {
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </div>
+  );
+}
+
+/**
+ * Main App Component
+ * Handles routing and authentication
+ */
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Layout />
       </Router>
     </AuthProvider>
   );

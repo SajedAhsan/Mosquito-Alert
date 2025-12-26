@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 /**
  * Report Schema - Mosquito breeding site reports
- * No AI validation - Admin manually reviews and validates
+ * AI validation is performed before submission
  */
 const reportSchema = new mongoose.Schema({
   userId: {
@@ -28,6 +28,10 @@ const reportSchema = new mongoose.Schema({
       trim: true,
     },
   },
+  locationText: {
+    type: String,
+    trim: true,
+  },
   breedingType: {
     type: String,
     required: [true, 'Breeding type is required'],
@@ -38,13 +42,17 @@ const reportSchema = new mongoose.Schema({
     required: [true, 'Severity is required'],
     enum: ['Low', 'Medium', 'High'],
   },
+  description: {
+    type: String,
+    trim: true,
+  },
   imagePath: {
     type: String,
     required: [true, 'Image is required'],
   },
   status: {
     type: String,
-    default: 'PENDING',
+    default: 'VALID',
     enum: ['PENDING', 'VALID', 'INVALID', 'IN_PROGRESS', 'CLEARED'],
   },
   pointsAwarded: {

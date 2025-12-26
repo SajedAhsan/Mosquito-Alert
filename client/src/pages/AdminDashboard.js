@@ -28,7 +28,7 @@ const AdminDashboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [allReports, setAllReports] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('pending');
+  const [activeTab, setActiveTab] = useState('valid');
 
   useEffect(() => {
     fetchData();
@@ -46,14 +46,21 @@ const AdminDashboard = () => {
           API.get('/reports'),
         ]);
 
-      setOverview(overviewRes.data);
-      setWeeklyReports(weeklyRes.data);
-      setBreedingDistribution(breedingRes.data);
-      setAreaRisk(riskRes.data);
-      setLeaderboard(leaderboardRes.data);
-      setAllReports(reportsRes.data);
+      setOverview(overviewRes.data || {});
+      setWeeklyReports(weeklyRes.data || []);
+      setBreedingDistribution(breedingRes.data || []);
+      setAreaRisk(riskRes.data || []);
+      setLeaderboard(leaderboardRes.data || []);
+      setAllReports(reportsRes.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
+      // Set default values on error
+      setOverview({});
+      setWeeklyReports([]);
+      setBreedingDistribution([]);
+      setAreaRisk([]);
+      setLeaderboard([]);
+      setAllReports([]);
     } finally {
       setLoading(false);
     }
@@ -172,16 +179,6 @@ const AdminDashboard = () => {
           <div className="border-b border-gray-200">
               <nav className="flex space-x-4 px-6 overflow-x-auto" aria-label="Tabs">
                 <button
-                  onClick={() => setActiveTab('pending')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm transition duration-200 whitespace-nowrap ${
-                    activeTab === 'pending'
-                      ? 'border-gray-500 text-gray-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  ⏱️ Pending ({pendingReports.length})
-                </button>
-                <button
                   onClick={() => setActiveTab('valid')}
                   className={`py-4 px-1 border-b-2 font-medium text-sm transition duration-200 whitespace-nowrap ${
                     activeTab === 'valid'
@@ -236,41 +233,6 @@ const AdminDashboard = () => {
 
           {/* Tab Content */}
           <div className="p-6">
-            {/* Pending Reports Tab */}
-            {activeTab === 'pending' && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                  ⏱️ Pending Reports - Awaiting Validation
-                </h2>
-                {pendingReports.length === 0 ? (
-                  <p className="text-gray-600">No pending reports</p>
-                ) : (
-                  <div className="space-y-4">
-                    {pendingReports.map((report) => (
-                      <div key={report._id} className="relative">
-                        <ReportCard report={report} />
-                        <div className="mt-3 flex space-x-2">
-                          <button
-                            onClick={() => handleStatusChange(report._id, 'VALID')}
-                            className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
-                          >
-                            ✓ Mark Valid (+10 pts)
-                          </button>
-                          <button
-                            onClick={() => handleStatusChange(report._id, 'INVALID')}
-                            className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
-                          >
-                            ✗ Mark Invalid (-5 pts)
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-              {/* Valid Reports Tab */}
               {activeTab === 'valid' && (
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800 mb-4">
@@ -366,78 +328,94 @@ const AdminDashboard = () => {
                   {/* Weekly Reports */}
                   <div className="bg-white p-6 rounded-lg shadow-md">
                     <h3 className="text-lg font-semibold mb-4">Weekly Reports</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={weeklyReports}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="day" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="count" fill="#10b981" />
-                      </BarChart>
-                    </ResponsiveContainer>
+                    {weeklyReports && weeklyReports.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={weeklyReports}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="day" />
+                          <YAxis />
+                          <Tooltip />
+                          <Legend />
+                          <Bar dataKey="count" fill="#10b981" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="h-[300px] flex items-center justify-center text-gray-500">
+                        No data available
+                      </div>
+                    )}
                   </div>
 
                   {/* Breeding Distribution */}
                   <div className="bg-white p-6 rounded-lg shadow-md">
                     <h3 className="text-lg font-semibold mb-4">Breeding Type Distribution</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={breedingDistribution}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={(entry) => entry.name}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {breedingDistribution.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
+                    {breedingDistribution && breedingDistribution.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={breedingDistribution}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={(entry) => entry.name}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {breedingDistribution.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="h-[300px] flex items-center justify-center text-gray-500">
+                        No data available
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Area Risk Table */}
                 <div className="bg-white p-6 rounded-lg shadow-md">
                   <h3 className="text-lg font-semibold mb-4">Area Risk Assessment</h3>
-                  <table className="min-w-full">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="px-4 py-2 text-left">Location</th>
-                        <th className="px-4 py-2 text-left">Report Count</th>
-                        <th className="px-4 py-2 text-left">Risk Score</th>
-                        <th className="px-4 py-2 text-left">Risk Level</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {areaRisk.map((area, index) => (
-                        <tr key={index} className="border-b">
-                          <td className="px-4 py-2">{area.location}</td>
-                          <td className="px-4 py-2">{area.reportCount}</td>
-                          <td className="px-4 py-2">{area.riskScore}</td>
-                          <td className="px-4 py-2">
-                            <span
-                              className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                area.riskLevel === 'High'
-                                  ? 'bg-red-100 text-red-800'
-                                  : area.riskLevel === 'Medium'
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : 'bg-green-100 text-green-800'
-                              }`}
-                            >
-                              {area.riskLevel}
-                            </span>
-                          </td>
+                  {areaRisk && areaRisk.length > 0 ? (
+                    <table className="min-w-full">
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="px-4 py-2 text-left">Location</th>
+                          <th className="px-4 py-2 text-left">Report Count</th>
+                          <th className="px-4 py-2 text-left">Risk Score</th>
+                          <th className="px-4 py-2 text-left">Risk Level</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {areaRisk.map((area, index) => (
+                          <tr key={index} className="border-b">
+                            <td className="px-4 py-2">{area.location}</td>
+                            <td className="px-4 py-2">{area.reportCount}</td>
+                            <td className="px-4 py-2">{area.riskScore}</td>
+                            <td className="px-4 py-2">
+                              <span
+                                className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                  area.riskLevel === 'High'
+                                    ? 'bg-red-100 text-red-800'
+                                    : area.riskLevel === 'Medium'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-green-100 text-green-800'
+                                }`}
+                              >
+                                {area.riskLevel}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <p className="text-gray-500 text-center py-8">No risk data available</p>
+                  )}
                 </div>
               </div>
             )}
