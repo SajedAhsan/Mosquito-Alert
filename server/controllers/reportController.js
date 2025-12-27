@@ -205,8 +205,8 @@ exports.updateReportStatus = async (req, res) => {
       });
     }
 
-    // If changing from VALID back to something else, remove awarded points
-    if (oldStatus === 'VALID' && status !== 'VALID') {
+    // If changing from VALID to INVALID, deduct awarded points
+    if (oldStatus === 'VALID' && status === 'INVALID') {
       pointsChange = -report.pointsAwarded;
       report.pointsAwarded = 0;
     }
@@ -225,7 +225,7 @@ exports.updateReportStatus = async (req, res) => {
     await report.populate('userId', 'name email');
 
     res.json({ 
-      message: `Report marked as ${status}. ${pointsChange > 0 ? `User earned ${pointsChange} points.` : pointsChange < 0 ? `User lost ${Math.abs(pointsChange)} points.` : ''}`,
+      message: `Report marked as ${status}. ${pointsChange > 0 ? `User earned ${pointsChange} points.` : pointsChange < 0 ? `User lost ${Math.abs(pointsChange)} points.` : 'Status updated successfully.'}`,
       report,
       pointsChange,
     });
