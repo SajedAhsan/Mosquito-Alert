@@ -12,7 +12,7 @@ Mosquito-borne diseases kill thousands annually, and 70% of mosquito breeding ha
 
 ## ✅ Solution
 
-Mosquito Alert+ turns citizens into frontline defenders with AI-validated photo reporting, duplicate detection, and intelligent risk prediction. Users earn points for verified reports, creating a gamified system that drives mass participation while authorities get real-time, accurate data to act on.
+Mosquito Alert+ turns citizens into frontline defenders with AI-validated photo reporting and intelligent risk prediction. Users earn points for verified reports, creating a gamified system that drives mass participation while authorities get real-time, accurate data to act on.
 
 ## 🏆 Why It Wins
 
@@ -23,7 +23,7 @@ Mosquito Alert+ turns citizens into frontline defenders with AI-validated photo 
 ## ✨ Key Features
 
 - Instant photo-based reporting with drag-and-drop simplicity
-- AI validation filters fake/duplicate submissions automatically
+- AI validation filters fake submissions automatically
 - Leaderboard rewards system driving user engagement
 - Admin dashboard with risk heatmaps and predictive analytics
 - Area-wise outbreak alerts for targeted intervention
@@ -31,7 +31,6 @@ Mosquito Alert+ turns citizens into frontline defenders with AI-validated photo 
 ## 🤖 AI / Smart Logic
 
 - **Image Validation:** Detects mosquito breeding environments using AI pattern recognition
-- **Duplicate Prevention:** Intelligent geolocation + image matching prevents spam and ensures data integrity
 
 ## 🛠️ Tech Stack
 
