@@ -65,10 +65,8 @@ const ReportCard = ({ report, showDeleteButton = false, onDelete }) => {
     });
   };
 
-  // Get image URL
-  const imageUrl = report.imagePath 
-    ? `http://localhost:5000/${report.imagePath.replace(/\\/g, '/')}`
-    : null;
+  // Get image URL - Cloudinary URLs are already full URLs
+  const imageUrl = report.imagePath || null;
 
   const statusBadge = getStatusBadge(report.status);
 

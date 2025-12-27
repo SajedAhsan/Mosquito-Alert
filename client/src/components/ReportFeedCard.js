@@ -131,9 +131,7 @@ const ReportFeedCard = ({ report, onDelete }) => {
     }
   };
 
-  const imageUrl = report.imagePath 
-    ? `http://localhost:5000/${report.imagePath.replace(/\\/g, '/')}`
-    : null;
+  const imageUrl = report.imagePath || null;
 
   const statusConfig = getStatusConfig(report.status);
   const severityConfig = getSeverityConfig(report.severity);
