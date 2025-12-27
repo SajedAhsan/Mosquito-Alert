@@ -45,4 +45,25 @@ React + Tailwind | Node.js + Express | MongoDB + JWT | AI Validation Engine
 
 ---
 
+## 🚀 Quick Start for Judges
+
+**Prerequisites:** Node.js + MongoDB
+
+```bash
+# Install dependencies
+cd server && npm install && cd ../client && npm install
+
+# Start servers
+cd ../server && npm run seed && npm run dev
+cd ../client && npm start
+```
+
+**Test Accounts:**
+- Admin: `admin@mosquitoalert.com` / `admin123456`
+- Or create new user via signup
+
+**See [SETUP_GUIDE.md](SETUP_GUIDE.md) for detailed setup**
+
+---
+
 **Built to save lives. Ready to scale.**
