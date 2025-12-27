@@ -1,103 +1,51 @@
 # 🦟 Mosquito Alert+
 
-**A professional community-driven platform for reporting and monitoring mosquito breeding sites with intelligent AI validation.**
+**Empowering communities to combat dengue by reporting mosquito breeding sites with AI-powered validation and real-time risk mapping.**
 
-[![MERN Stack](https://img.shields.io/badge/Stack-MERN-brightgreen)](https://github.com)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![MongoDB](https://img.shields.io/badge/Database-MongoDB-green)](https://www.mongodb.com/)
-[![React](https://img.shields.io/badge/Frontend-React-blue)](https://reactjs.org/)
-[![Node.js](https://img.shields.io/badge/Backend-Node.js-green)](https://nodejs.org/)
+🔗 **Live Demo:** https://mosquito-alert.vercel.app/login
 
 ---
 
-## 📖 Overview
+## 🚨 Problem
 
-Mosquito Alert+ is a full-stack web application designed to empower communities in the fight against mosquito-borne diseases. Users can report potential breeding sites with photographic evidence, while an intelligent AI system validates submissions to ensure data quality. The platform features real-time analytics, gamification through a points system, and comprehensive administrative tools for public health officials.
+Dengue fever kills thousands annually, and 70% of mosquito breeding happens in urban areas that go unreported. Traditional tracking systems are slow, unreliable, and lack community engagement. We need a faster, smarter way to identify and eliminate breeding sites before outbreaks occur.
 
-### Key Highlights
+## ✅ Solution
 
-- **Community Engagement**: Enable citizens to actively participate in mosquito control efforts
-- **AI-Powered Validation**: Intelligent rule-based system to filter duplicate and invalid reports
-- **Real-Time Analytics**: Data-driven insights for tracking breeding hotspots and trends
-- **Gamification**: Points-based reward system to encourage community participation
-- **Professional Admin Tools**: Comprehensive dashboard with charts, leaderboards, and risk assessments
+Mosquito Alert+ turns citizens into frontline defenders with AI-validated photo reporting, duplicate detection, and intelligent risk prediction. Users earn points for verified reports, creating a gamified system that drives mass participation while authorities get real-time, accurate data to act on.
 
----
+## 🏆 Why It Wins
 
-## ✨ Features
+- **Real Impact:** Prevents disease outbreaks by accelerating breeding site elimination
+- **Community-Driven:** Gamification turns reporting into a rewarding social movement
+- **Scalable & Actionable:** AI validation ensures authorities receive quality data, not noise
 
-### 👤 User Portal
+## ✨ Key Features
 
-- **Secure Authentication**: JWT-based signup and login system with encrypted passwords
-- **Interactive Reporting**: 
-  - Drag-and-drop image upload with instant preview
-  - Location picker for precise geolocation
-  - Breeding site type classification
-  - Severity assessment (Low, Medium, High)
-- **Personal Dashboard**: 
-  - View all submitted reports in a clean, modern feed
-  - Track individual points and contribution statistics
-  - Monitor report status (Pending, Approved, Rejected)
-  - Access personal reports history
-- **My Reports**: Dedicated section to manage and review your submissions
-- **Leaderboard**: View top contributors and community rankings
+- Instant photo-based reporting with drag-and-drop simplicity
+- AI validation filters fake/duplicate submissions automatically
+- Leaderboard rewards system driving user engagement
+- Admin dashboard with risk heatmaps and predictive analytics
+- Area-wise outbreak alerts for targeted intervention
 
-### 👨‍💼 Admin Dashboard
+## 🤖 AI / Smart Logic
 
-- **Comprehensive Analytics** (Powered by Recharts):
-  - Weekly reports trend visualization with bar charts
-  - Breeding type distribution analysis via pie charts
-  - Area-wise risk assessment with sortable data tables
-  - Real-time statistics overview
-- **Report Management**:
-  - Review all community submissions
-  - Update report status (Approve/Reject)
-  - Access complete report details with images
-- **User Analytics**:
-  - View all registered users
-  - Monitor user activity and contributions
-  - Access leaderboard rankings
-- **Secure Access**: Pre-seeded admin accounts (no public signup)
+- **Image Validation:** Detects mosquito breeding environments using AI pattern recognition
+- **Duplicate Prevention:** Intelligent geolocation + image matching prevents spam and ensures data integrity
 
-### 🤖 AI Validation Engine
+## 🛠️ Tech Stack
 
-**Intelligent Duplicate Detection**
-- Identifies reports with same location, breeding type, and within 7-day window
-- Prevents spam and ensures data quality
+React + Tailwind | Node.js + Express | MongoDB + JWT | AI Validation Engine
 
-**Multi-Factor Scoring Algorithm**
-| Factor | Points | Description |
-|--------|--------|-------------|
-| High Severity | +3 | Critical breeding sites prioritized |
-| Standing Water Type | +3 | Most common breeding ground |
-| Image Evidence | +2 | Visual proof increases credibility |
-| Rainy Season | +2 | Higher risk during monsoon (June-September) |
-| Area Activity | +2 | Multiple reports in same location |
+## 👥 Team
 
-**Automated Verdict System**
-- **VALID** (Score ≥ 6): Automatically approved, user receives 10 points
-- **NEEDS REVIEW** (Score 3-5): Flagged for admin verification, 5 points upon approval
-- **INVALID** (Score < 3): Automatically rejected, 0 points
+- **Sajed Ahsan** — Backend, Frontend & AI
+- **Abid Hossain** — Backend & Frontend
+- **Abdullah Al Siyam** — Researcher
 
 ---
 
-## 🛠️ Technology Stack
-
-### Frontend Architecture
-| Technology | Purpose | Version |
-|------------|---------|---------|
-| **React** | UI Framework | 18.x |
-| **React Router** | Client-side routing | 6.x |
-| **Tailwind CSS** | Utility-first styling | 3.x |
-| **Axios** | HTTP client with interceptors | 1.x |
-| **Recharts** | Data visualization library | 2.x |
-| **React Icons** | Icon components | 4.x |
-
-### Backend Architecture
-| Technology | Purpose | Version |
-|------------|---------|---------|
-| **Node.js** | JavaScript runtime | 14+ |
-| **Express.js** | Web application framework | 4.x |
+**Built to save lives. Ready to scale.**
 | **MongoDB** | NoSQL database | 5.x |
 | **Mongoose** | MongoDB ODM | 7.x |
 | **JWT** | Token-based authentication | 9.x |
