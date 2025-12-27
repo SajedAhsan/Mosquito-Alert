@@ -49,6 +49,40 @@ app.get('/', (req, res) => {
 });
 
 /**
+ * One-time Admin Seeder Endpoint (REMOVE AFTER USE!)
+ */
+app.get('/seed-admin-now', async (req, res) => {
+  try {
+    const bcrypt = require('bcryptjs');
+    const Admin = require('./models/Admin');
+    
+    // Check if admin already exists
+    const existingAdmin = await Admin.findOne({ email: 'admin@mosquitoalert.com' });
+    if (existingAdmin) {
+      return res.json({ message: 'Admin already exists', email: existingAdmin.email });
+    }
+    
+    // Create admin
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash('admin123456', salt);
+    
+    const admin = await Admin.create({
+      name: 'Admin User',
+      email: 'admin@mosquitoalert.com',
+      password: hashedPassword
+    });
+    
+    res.json({ 
+      message: 'Admin seeded successfully!', 
+      email: admin.email,
+      note: 'Now remove this endpoint from server.js!'
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Seed failed', error: error.message });
+  }
+});
+
+/**
  * 404 Handler
  */
 app.use((req, res) => {
