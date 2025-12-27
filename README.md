@@ -1,6 +1,6 @@
 # 🦟 Mosquito Alert+
 
-**Empowering communities to combat dengue by reporting mosquito breeding sites with AI-powered validation and real-time risk mapping.**
+**Empowering communities to combat Mosquito-borne diseases by reporting mosquito breeding sites with AI-powered validation and real-time risk mapping.**
 
 🔗 **Live Demo:** https://mosquito-alert.vercel.app/login
 
@@ -8,7 +8,7 @@
 
 ## 🚨 Problem
 
-Dengue fever kills thousands annually, and 70% of mosquito breeding happens in urban areas that go unreported. Traditional tracking systems are slow, unreliable, and lack community engagement. We need a faster, smarter way to identify and eliminate breeding sites before outbreaks occur.
+Mosquito-borne diseases kill thousands annually, and 70% of mosquito breeding happens in urban areas that go unreported. Traditional tracking systems are slow, unreliable, and lack community engagement. We need a faster, smarter way to identify and eliminate breeding sites before outbreaks occur.
 
 ## ✅ Solution
 
@@ -58,11 +58,9 @@ cd ../server && npm run seed && npm run dev
 cd ../client && npm start
 ```
 
-**Test Accounts:**
-- Admin: `admin@mosquitoalert.com` / `admin123456`
-- Or create new user via signup
+**Create new user via signup or use pre-seeded admin account**
 
-**See [SETUP_GUIDE.md](SETUP_GUIDE.md) for detailed setup**
+**See [Documentation/SETUP_GUIDE.md](Documentation/SETUP_GUIDE.md) for detailed setup**
 
 ---
 
