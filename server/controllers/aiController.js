@@ -12,11 +12,13 @@ require('dotenv').config();
  */
 async function validateWithRoboflow(imagePath) {
   try {
-    const apiKey = process.env.ROBOFLOW_API_KEY;
+    // Try environment variable first, then use hardcoded as fallback
+    const apiKey = process.env.ROBOFLOW_API_KEY || 'b7QBnc2Bf7oOsZ6N28Hs';
 
     console.log('🔑 API Key Status:', apiKey ? 'LOADED ✅' : 'MISSING ❌');
     console.log('🔑 API Key Length:', apiKey ? apiKey.length : 0);
     console.log('🔑 First 10 chars:', apiKey ? apiKey.substring(0, 10) + '...' : 'N/A');
+    console.log('🔑 Source:', process.env.ROBOFLOW_API_KEY ? 'Environment Variable' : 'Hardcoded Fallback');
 
     if (!apiKey) {
       throw new Error('Roboflow API key not configured. Check .env file.');
