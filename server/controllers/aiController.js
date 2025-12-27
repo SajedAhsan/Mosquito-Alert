@@ -27,7 +27,7 @@ async function validateWithRoboflow(imagePath) {
     // Call Roboflow Workflow API with base64 image
     const response = await axios({
       method: 'POST',
-      url: 'https://serverless.roboflow.com/mosquito-breeding-sites/workflows/custom-workflow-2',
+      url: 'https://serverless.roboflow.com/mosquito-breeding-sites/workflows/custom-workflow',
       headers: {
         'Content-Type': 'application/json'
       },
