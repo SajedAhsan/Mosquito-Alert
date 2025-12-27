@@ -88,6 +88,24 @@ export const AuthProvider = ({ children }) => {
     setUser(updatedUser);
   };
 
+  /**
+   * Refresh user data from server (to get latest points)
+   */
+  const refreshUser = async () => {
+    try {
+      const { data } = await API.get('/auth/me');
+      const updatedUser = { 
+        ...user, 
+        points: data.points 
+      };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      return { success: true };
+    } catch (error) {
+      return { success: false };
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -95,6 +113,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateUser,
+    refreshUser,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
   };

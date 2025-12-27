@@ -11,7 +11,7 @@ import LocationPicker from '../components/LocationPicker';
  */
 const CreateReport = () => {
   const navigate = useNavigate();
-  const { user, updateUser } = useContext(AuthContext);
+  const { user, updateUser, refreshUser } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     locationText: '',
@@ -228,8 +228,8 @@ const CreateReport = () => {
       setEarnedPoints(data.pointsEarned || 10);
       setShowSuccessModal(true);
       
-      // Update user points
-      updateUser({ points: user.points + (data.pointsEarned || 10) });
+      // Refresh user points from server
+      await refreshUser();
 
       // Reset form
           setFormData({ locationText: '', description: '', breedingType: '', severity: '' });
