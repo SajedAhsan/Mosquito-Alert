@@ -73,7 +73,7 @@ exports.createReport = async (req, res) => {
       description: description || null,
       breedingType,
       severity,
-      imagePath: req.file.path,
+      imagePath: req.file.path, // Cloudinary URL
       status: 'VALID',
       pointsAwarded: 10, // Award points immediately since AI validated
     });
